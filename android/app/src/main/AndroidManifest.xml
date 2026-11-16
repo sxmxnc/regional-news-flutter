@@ -1,0 +1,65 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Laufzeitrecht ab Android 13 (ANF-NF-04) — firebase_messaging fragt es
+         über requestPermission() ab, aber nur, wenn es hier deklariert ist.
+         Die Abfrage selbst löst erst NotificationsController.enable() aus,
+         nie der App-Start (ANF-NF-14 AK3). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- android:label ist der Name unter dem Symbol und in jedem
+         Systemdialog (Berechtigungen, Einstellungen → Apps). Bis zur
+         Geräteprüfung am 28.09.2026 stand dort der technische Projektname
+         aus `flutter create` (E-117). -->
+    <application
+        android:label="Regional News Demo"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Specifies an Android theme to apply to this Activity as soon as
+                 the Android process has started. This theme is visible to the user
+                 while the Flutter UI initializes. After that, this theme continues
+                 to determine the Window background behind the Flutter UI. -->
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <!-- Don't delete the meta-data below.
+             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+        <!-- ANF-NF-14 AK3 und docs/uebernahme-altanwendung.md („Gerätetoken vor
+             der Einwilligung senden" steht auf der Negativliste): Ohne diesen
+             Eintrag meldet sich firebase_messaging beim App-Start von selbst
+             bei FCM an und erzeugt einen Gerätetoken — vor jeder
+             Einwilligung. Die Abnahme von ANF-F-40 verlangt
+             ausdrücklich einen Netzmitschnitt OHNE Gerätetoken vor dem
+             Einschalten. Eingeschaltet wird die Anmeldung erst in
+             FirebaseMessagingPushService.requestPermissionAndToken(). -->
+        <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="false" />
+    </application>
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+    </queries>
+</manifest>
